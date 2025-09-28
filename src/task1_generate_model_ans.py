@@ -122,11 +122,8 @@ This is the most important section. Iterate through every error, omission, or mi
 * **Correction:** This is incorrect. A thread is not a separate program but the smallest unit of execution *within* a process. Threads of the same process share the same memory space, whereas separate programs (processes) do not.
 ### 4. Actionable Path to Improvement
 Suggest concrete next steps for the student. For example: "To improve, the student should review the concepts of 'shared memory vs. separate memory spaces' and practice explaining the 'process state model'."
-### 5. Estimated Score
-Provide a numerical score and a brief, one-sentence justification that links back to the major issues identified in the breakdown.
----
+--
 **Question:** "{question_text}"
-**Maximum Marks:** {max_marks}
 **Model Answer:**
 "{model_answer_text}"
 **Student's Answer:**
