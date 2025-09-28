@@ -19,7 +19,7 @@ def get_gemini_response(prompt: str) -> str:
     
     generation_config = {
         "temperature": 0.0,
-        "max_output_tokens": 4096, # Increased token limit for detailed answers
+        "max_output_tokens": 8192, # Increased token limit for detailed answers
     }
 
     model = genai.GenerativeModel(
