@@ -6,3 +6,6 @@ llama-index-embeddings-gemini
 pytesseract
 Pillow
 opencv-python
+Flask
+markdown 
+beautifulsoup4

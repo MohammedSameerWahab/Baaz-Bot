@@ -59,10 +59,29 @@ def start_chat_session():
     Initializes the RAG system and starts an interactive chat loop.
     """
     index = setup_rag_system()
-    chat_engine = index.as_chat_engine(chat_mode='condense_plus_context')
+
+    system_prompt = (
+        "You are Baaz Bot, a friendly and encouraging AI mentor. "
+        "Your primary purpose is to help a student understand why they lost marks on their exam evaluation. "
+        "You have been given a context document that contains a detailed analysis of their answers. "
+        "Follow these rules:\n"
+        "1. **For exam-related questions:** When the user asks about their performance, a specific question number (e.g., 'question 3'), or a concept "
+        "mentioned in their evaluation, you MUST use the provided context to give a detailed and helpful answer.\n"
+        "2. **For general questions:** If the user asks a general question about you (e.g., 'who are you?', 'what can you do?', 'what is your name?'), "
+        "answer it based on your persona as Baaz Bot. Do NOT try to find the answer in the context for these questions.\n"
+        "3. **For unrelated questions:** If a question is completely unrelated to the exam or your purpose (e.g., 'what is the capital of France?'), "
+        "politely state that you can only help with questions about the student's evaluation.\n"
+        "Always be supportive and encouraging in your tone."
+    )
+    
+    # --- MODIFIED: Pass the system_prompt to the chat engine ---
+    chat_engine = index.as_chat_engine(
+        chat_mode='condense_plus_context',
+        system_prompt=system_prompt
+    )
     
     print("\n🎓 Smart Mentor Chatbot is ready!")
-    print("Ask me questions about your answers, like 'Why did I lose marks in question 1?' or 'Explain photosynthesis in more detail.'")
+    print("Ask me questions about your answers")
     print("Type 'exit' to end the session.")
 
     while True:

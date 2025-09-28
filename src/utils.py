@@ -2,6 +2,8 @@
 import pytesseract
 from PIL import Image
 import cv2
+import markdown
+from bs4 import BeautifulSoup
 
 # IMPORTANT FOR WINDOWS USERS:
 # You may need to tell pytesseract where you installed Tesseract.
@@ -121,3 +123,24 @@ Now, provide the structured JSON object.
         print(f"❌ Failed to parse LLM response as JSON: {e}")
         print(f"   LLM Response was: {response_text}")
         return {} # Return empty dictionary on failure
+    
+def strip_markdown(markdown_text: str) -> str:
+    """
+    Converts a string of Markdown text to plain text.
+    
+    Args:
+        markdown_text: The string containing Markdown formatting.
+        
+    Returns:
+        The plain text representation of the input string.
+    """
+    # 1. Convert Markdown to HTML
+    html = markdown.markdown(markdown_text)
+    
+    # 2. Use BeautifulSoup to parse the HTML and extract text
+    soup = BeautifulSoup(html, "html.parser")
+    
+    # 3. Get the plain text, ensuring clean spacing
+    plain_text = soup.get_text(separator='\n').strip()
+    
+    return plain_text
