@@ -1,180 +1,153 @@
-Baaz Bot: An AI-Powered Smart Mentor for Academic Feedback
+# Baaz Bot 🦅
 
-Baaz Bot is a sophisticated, multi-stage chatbot designed to act as a personal AI mentor for students. It bridges the gap between receiving a grade and truly understanding the feedback by allowing students to have a natural conversation about their exam performance. The bot analyzes a student's answer script, compares it against model answers, and provides detailed, context-aware explanations for why marks were lost.
+**A smart AI-powered mentor to help students understand exactly where and why they lost marks on their examinations.**
 
-✨ Core Features
+Baaz Bot goes beyond just giving a grade. It provides a detailed, conversational breakdown of a student's performance by comparing their answer script (read via OCR) to a "gold-standard" model answer.
 
-AI-Powered Feedback Generation: Uses a Large Language Model (LLM) to act as a subject matter expert, generating ideal "model answers" and creating detailed, constructive feedback by comparing them with the student's script.
+## ✨ Key Features
 
-RAG-Based Conversational AI: The generated feedback and model answers are used to build a knowledge base for a Retrieval-Augmented Generation (RAG) chatbot, ensuring all responses are grounded in the specific context of the student's evaluation.
+  * **Intelligent Evaluation:** Uses a Generative LLM (Google Gemini) to perform a detailed comparison between a student's answer and a model solution.
+  * **Interactive RAG Chatbot:** Built with LlamaIndex, the bot allows students to ask follow-up questions about their evaluation in a natural, conversational way.
+  * **OCR Integration:** Reads student answers directly from uploaded images (typed text) using Tesseract and OpenCV for image preprocessing.
+  * **Modern Web UI:** A clean, responsive chat interface built with Flask, HTML, and CSS.
+  * **Real-time Streaming:** Bot responses are streamed word-by-word (via SSE) and render Markdown in real-time for a smooth, modern user experience.
+  * **Conversation History:** Remembers the context of the chat for intelligent, follow-up questions.
 
-OCR for Answer Script Digitization: Automatically extracts text from images of typed answer scripts using Tesseract OCR with OpenCV-powered image preprocessing for improved accuracy.
+## ⚙️ How It Works (The Two-Tiered Architecture)
 
-Conversational History: Maintains a unique conversation history for each user session, allowing the bot to understand follow-up questions and provide context-aware responses.
+This project is built on a two-tiered approach to ensure high-quality, relevant responses.
 
-Real-time Streaming Interface: Features a modern web interface built with Flask, where the bot's responses are streamed character-by-character for a dynamic and engaging user experience.
+### Task 1: The "Insight Generation" Pipeline (Backend)
 
-Intelligent Persona: The bot is configured with a system prompt that allows it to answer both specific questions about the exam and general questions about its own purpose and capabilities.
+This is the data preparation step, orchestrated by `main.py`.
 
-🚀 Project Workflow
+1.  **Read Inputs:** The system takes the official `questions.json` and a folder of the student's answer images (e.g., `data/student_01/`).
+2.  **Run OCR:** Images are preprocessed with OpenCV and read by Tesseract to extract the raw text.
+3.  **Generate Model Answers:** The LLM generates a "gold-standard" model answer for each question.
+4.  **Generate Insights:** The LLM performs a detailed comparison, grading the student's answer against the model answer and producing a comprehensive feedback document (`insights.txt`).
 
-The project operates on a powerful two-tiered approach:
+### Task 2: The "RAG Chatbot" (Frontend)
 
-Phase 1: Data Generation & Indexing (main.py)
+This is the live web application, run by `app.py`.
 
-The system takes an exam's question paper (questions.json) and images of a student's answer script.
+1.  **Indexing:** On startup, LlamaIndex builds a vector index from the `insights.txt` file created in Task 1. This index becomes the bot's "knowledge base."
+2.  **User Interaction:** A student interacts with the Baaz Bot web interface.
+3.  **Context-Aware RAG:** When a student asks a question ("Why did I lose marks on question 3?"), the chat engine (using RAG) retrieves the most relevant parts of the `insights.txt` file to formulate a precise, context-aware answer.
+4.  **Full Conversation:** The engine maintains session history, allowing students to ask general questions ("Who are you?") or follow-ups ("Can you explain that concept in more detail?").
 
-It uses an LLM (Gemini) to generate ideal, "gold-standard" model answers for each question.
+## 🛠️ Tech Stack
 
-It then uses the LLM again, this time acting as an expert evaluator, to compare the student's answers (extracted via OCR) with the model answers. This produces a detailed insights.txt file.
+  * **Backend:** Python, Flask
+  * **AI/LLM:** Google Gemini (via API)
+  * **RAG/VectorDB:** LlamaIndex
+  * **Embeddings:** Hugging Face `bge-small-en-v1.5` (local)
+  * **OCR:** Tesseract, OpenCV-Python
+  * **Frontend:** HTML, CSS, JavaScript
+  * **Libraries:** `marked.js` (for Markdown rendering), `EventSource` (for streaming)
 
-This insights.txt file becomes the knowledge base for the next phase.
+## 📁 Project Structure
 
-Phase 2: Conversational Chat (app.py)
-
-A RAG pipeline is created using the insights.txt file as its source of truth.
-
-A Flask web server is launched, providing a user-friendly chat interface.
-
-Students can ask questions like, "Why did I lose marks in question 2?" or "What key points did I miss for the deadlock question?", and the bot will use its knowledge base to provide specific, helpful answers.
-
-🛠️ Technology Stack
-
-Backend: Flask
-
-AI & RAG: LlamaIndex, Google Generative AI (Gemini)
-
-Vector Store & Embeddings: LlamaIndex (local storage), Hugging Face Transformers (bge-small-en-v1.5)
-
-OCR: Tesseract, OpenCV, Pytesseract, Pillow
-
-Frontend: HTML, CSS, JavaScript
-
-Real-time Rendering: marked.js
-
-📂 Project Structure
-
+```
 smart-mentor-chatbot/
-├── app.py              # Main Flask web application
-├── main.py             # Orchestrator script for data generation
-├── requirements.txt    # Project dependencies
-├── .env                # For API keys (not in repo)
+├── app.py              # Main Flask web application (Task 2)
+├── main.py             # Orchestrator script for data processing (Task 1)
+├── requirements.txt
+├── .env.example        # Example environment file
 ├── data/
 │   ├── questions.json
-│   └── student_01/     # Example folder for student answer images
-│       ├── page_01.png
-│       └── ...
+│   └── student_01/     # Folder for student's answer images
 ├── src/
-│   ├── task1_generate_model_answers.py
-│   ├── task2_build_rag.py
-│   ├── llm_client.py
-│   └── utils.py
+│   ├── task1_... .py   # Logic for generating model answers & insights
+│   ├── task2_... .py   # Logic for building and querying the RAG index
+│   ├── llm_client.py   # Wrapper for Gemini API calls
+│   └── utils.py        # OCR, parsing, & text-processing helpers
 ├── static/
 │   ├── css/style.css
-│   ├── js/script.js
-│   └── images/logo.png
+│   └── js/script.js
 └── templates/
     └── index.html
+```
 
+## 🚀 Getting Started
 
-⚙️ Setup and Installation
+### Prerequisites
 
-Follow these steps to get the project running on your local machine.
+1.  **Python 3.10+**
+2.  **Tesseract OCR Engine:** You must install Tesseract on your system.
+      * **Windows:** Download and run the installer from [here](https://www.google.com/search?q=https://github.com/UB-Mannheim/tesseract/wiki).
+          * **Important:** After installation, you must manually update the Tesseract path in `src/utils.py`:
+            ```python
+            pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+            ```
+      * **macOS:** `brew install tesseract`
+      * **Linux:** `sudo apt-get install tesseract-ocr`
 
-1. Prerequisites
+### Installation
 
-Python 3.9+
+1.  **Clone the repository:**
 
-Tesseract OCR Engine
+    ```bash
+    git clone https://github.com/MohammedSameerWahab/baaz-bot.git
+    cd baaz-bot
+    ```
 
-2. Clone the Repository
+2.  **Create and activate a virtual environment:**
 
-git clone [https://github.com/your-username/smart-mentor-chatbot.git](https://github.com/MohammedSameerWahab/baaz-bot.git)
-cd baaz-bot
+    ```bash
+    python -m venv myVenv
+    # Windows
+    .\myVenv\Scripts\activate
+    # macOS/Linux
+    source myVenv/bin/activate
+    ```
 
+3.  **Install the required Python packages:**
 
-3. Install Tesseract OCR
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-You must install the Tesseract engine on your operating system.
+4.  **Set up your environment variables:**
 
-Windows: Download and run the installer from the official Tesseract repository. After installation, you must configure the path in src/utils.py.
+      * Create a file named `.env` in the root directory.
+      * Add your Gemini API key:
+        ```ini
+        GEMINI_API_KEY="YOUR_API_KEY_HERE"
+        ```
 
-macOS: brew install tesseract
+### How to Run
 
-Linux (Debian/Ubuntu): sudo apt-get install tesseract-ocr
+The project runs in two stages. You must run Stage 1 at least once to create the knowledge base for Stage 2.
 
-4. Create a Virtual Environment
+#### Stage 1: Generate the Insights
 
-# For Windows
-python -m venv venv
-venv\Scripts\activate
+1.  **Add Questions:** Edit `data/questions.json` to include the exam questions.
+2.  **Add Student Answers:** Place the student's answer script images (e.g., `page_01.png`, `page_02.png`) inside a folder like `data/student_01`.
+3.  **Run the Pipeline:**
+    ```bash
+    python main.py generate-all data/student_01
+    ```
+    This will run the full OCR and LLM analysis, creating `data/model_answers.json` and `data/insights.txt`. This step also creates the `storage` directory, which is the vector index for the chatbot.
 
-# For macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+#### Stage 2: Run the Baaz Bot Web App
 
+1.  **Start the Flask Server:**
 
-5. Install Dependencies
+    ```bash
+    flask run
+    ```
 
-pip install -r requirements.txt
+    (This will use the `app.py` file)
 
+2.  **Open the Chatbot:**
+    Open your browser and navigate to **`http://127.0.0.1:5000`**. You can now chat with Baaz Bot\!
 
-6. Set Up Environment Variables
+## 🔮 Project Roadmap
 
-Create a file named .env in the root of the project and add your Google Generative AI API key:
+  * [✅] **Stage 1:** Initial prototype with plain text files.
+  * [✅] **Stage 2:** Integrate OCR for typed-text images (Tesseract + OpenCV).
+  * [⬜️] **Stage 3:** Implement advanced OCR for handwritten text using a cloud-based service like Google Cloud Vision API.
 
-GEMINI_API_KEY="YOUR_GEMINI_API_KEY_HERE"
-FLASK_SECRET_KEY="a_random_secret_string_for_sessions"
+## 📄 License
 
-
-7. Configure Tesseract Path (for Windows)
-
-Open src/utils.py and update the pytesseract.pytesseract.tesseract_cmd line with the correct path to your Tesseract installation (e.g., r'C:\Program Files\Tesseract-OCR\tesseract.exe').
-
-▶️ How to Run the Application
-
-The application is run in two stages: first, you generate the analysis files, and second, you run the web app.
-
-Stage 1: Generate Insights from an Answer Script
-
-Prepare Data:
-
-Add your exam questions to data/questions.json.
-
-Place the images of the student's answer script in a dedicated folder, e.g., data/student_01/.
-
-Run the Generation Script:
-Execute the following command in your terminal. This will perform all the necessary steps: generating model answers, running OCR on the images, and creating the final insights.txt file.
-
-python main.py generate-all data/student_01
-
-
-This will create data/model_answers.json and data/insights.txt. It will also create a storage directory, which is the vector index for the RAG system.
-
-Stage 2: Run the Baaz Bot Web App
-
-Start the Flask Server:
-
-flask run
-
-
-Access the Chatbot:
-Open your web browser and navigate to http://127.0.0.1:5000.
-
-You can now start chatting with Baaz Bot!
-
-🛣️ Future Work
-
-Stage 3: Handwriting Recognition: The next major step is to move beyond typed text and integrate a more powerful OCR service (like Google Cloud Vision API) capable of accurately recognizing handwritten answers.
-
-User Authentication: Add a user login system to manage and store evaluations for multiple students.
-
-Database Integration: Store insights and chat histories in a database (e.g., PostgreSQL or MongoDB) instead of local files for better scalability.
-
-🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a pull request or open an issue.
-
-📄 License
-
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
