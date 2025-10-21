@@ -2,7 +2,7 @@
 
 **A smart AI-powered mentor to help students understand exactly where and why they lost marks on their examinations.**
 
-Baaz Bot goes beyond just giving a grade. It provides a detailed, conversational breakdown of a student's performance by comparing their answer script (read via OCR) to a "gold-standard" model answer.
+It provides a detailed, conversational breakdown of a student's performance by comparing their answer script (read via OCR) to a "gold-standard" model answer.
 
 ## ✨ Key Features
 
@@ -151,3 +151,4 @@ The project runs in two stages. You must run Stage 1 at least once to create the
 ## 📄 License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
